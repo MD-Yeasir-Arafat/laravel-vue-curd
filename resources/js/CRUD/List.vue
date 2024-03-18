@@ -8,24 +8,48 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-primary">
+                            <table class="table table-light">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Column 1</th>
-                                        <th scope="col">Column 2</th>
-                                        <th scope="col">Column 3</th>
+                                        <th scope="col">Sl</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Phone</th>
+                                        <th scope="col">Gender</th>
+                                        <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="">
-                                        <td scope="row">R1C1</td>
-                                        <td>R1C2</td>
-                                        <td>R1C3</td>
-                                    </tr>
-                                    <tr class="">
-                                        <td scope="row">Item</td>
-                                        <td>Item</td>
-                                        <td>Item</td>
+                                    <tr
+                                        v-for="(student, index) in students"
+                                        :key="index"
+                                    >
+                                        <td>{{ ++index }}</td>
+                                        <td>{{ student.name }}</td>
+                                        <td>{{ student.email }}</td>
+                                        <td>{{ student.phone }}</td>
+                                        <td>{{ student.gender }}</td>
+                                        <td>
+                                            <router-link
+                                                :to="{
+                                                    name: 'edit',
+                                                    params: {
+                                                        id: student.id,
+                                                    },
+                                                }"
+                                                class="btn btn-info btn-sm"
+                                                >Edit</router-link
+                                            >
+                                            &nbsp;
+                                            <a
+                                                href=""
+                                                class="btn btn-danger btn-sm"
+                                                @click.prevent="
+                                                    destroy(student.id)
+                                                "
+                                                >Delete</a
+                                            >
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -37,6 +61,44 @@
     </div>
 </template>
 <script>
-export default {};
+import axios from "axios";
+
+export default {
+    data() {
+        return {
+            students: [],
+        };
+    },
+
+    mounted() {
+        this.fetchStudents();
+    },
+
+    methods: {
+        fetchStudents() {
+            axios
+                .get("/api/students")
+                .then((res) => {
+                    this.students = res.data;
+                })
+                .catch((err) => {});
+        },
+
+        destroy(id) {
+            if (!window.confirm("Are you sure to Delete data")) {
+                return;
+            }
+
+            axios
+                .delete("/api/students/" + id)
+                .then((result) => {
+                    if (result.status === 200) {
+                        this.fetchStudents();
+                    }
+                })
+                .catch((err) => {});
+        },
+    },
+};
 </script>
 <style lang=""></style>

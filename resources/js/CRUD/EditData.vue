@@ -9,7 +9,7 @@
                         >
                     </div>
                     <div class="card-body">
-                        <form @submit.prevent="storeData">
+                        <form @submit.prevent="updateData">
                             <div class="mb-3">
                                 <label for="name" class="form-label"
                                     >Name</label
@@ -78,7 +78,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary">
-                                Submit
+                                Update
                             </button>
                         </form>
                     </div>
@@ -103,17 +103,36 @@ export default {
         }
     },
 
+    mounted() {
+        this.editData();
+    },
+
     methods: {
-        storeData(){
-           axios.post("/api/students", this.form)
-           .then((res) => {
-            if(res.status === 201){
-                    this.form = '',
+        editData() {
+            axios
+                .get("/api/students/" + this.$route.params.id)
+                .then((res) => {
+                    if (res.status == 200) {
+                        this.form = res.data.data;
+                    }
+                })
+                .catch((err) => {});
+        },
+
+        updateData() {
+            axios
+                .put("/api/students/" + this.$route.params.id, this.form)
+                .then((res) => {
+                    if(res.status === 200){
+                    this.form = ''
                     this.errors = ''
+
+                    this.$router.push({name: 'List'})
                 }
-           }).catch((err) => {
-                this.errors = err.response.data.errors
-           })
+                })
+                .catch((err) => {
+                    this.errors = err.response.data.errors;
+                });
         },
 
        
